@@ -6,4 +6,61 @@
     android:layout_height="match_parent"
     tools:context=".ScoreActivity">
 
+    <LinearLayout
+        android:id="@+id/scoreActivity_linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="32dp"
+
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/scoreActivity_linearLayout_textViewScore"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="20dp"
+            android:gravity="center"
+            android:text="SCORE"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/scoreActivity_linearLayout_textViewScoreNumbers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:gravity="center"
+            android:text="5 / 10"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="?android:attr/listDivider" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/scoreActivity_buttonDone"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:layout_width="329dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="61dp"
+        android:layout_marginBottom="184dp"
+        android:background="@drawable/round_corner"
+        android:text="Done"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scoreActivity_linearLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

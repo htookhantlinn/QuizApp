@@ -25,6 +25,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     public List<Question> questionList = new ArrayList<>();
     private int quesNum;
     private CountDownTimer countDownTimer;
+    private int score;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +119,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     private void checkAnswer(int selectedOption, View view) {
         if (selectedOption == questionList.get(quesNum).getCorrectAns()) {
             //Right Answer
-
+            score++;
             ((Button) view).setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
         } else {
             //Wrong Answer
@@ -167,6 +168,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         } else {
             // Go to Score Activity
             Intent intent = new Intent(QuestionActivity.this, ScoreActivity.class);
+            intent.putExtra("SCORE", String.valueOf(score)+" / "+String.valueOf(questionList.size()));
             startActivity(intent);
             QuestionActivity.this.finish();
         }
