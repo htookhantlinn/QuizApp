@@ -15,6 +15,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/categoryActivity_toolbar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"

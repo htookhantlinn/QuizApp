@@ -12,6 +12,7 @@
         android:id="@+id/setsActivity_toolbar"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:background="@color/colorPrimary" />
 
     <TextView
