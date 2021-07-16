@@ -8,6 +8,7 @@ import android.app.Dialog;
 
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -22,7 +23,7 @@ public class SetsActivity extends AppCompatActivity {
 
     private GridView gridViewSets;
     private FirebaseFirestore firebaseFirestore;
-    private int category_id;
+    public static int category_id;
     private Dialog loadingDialog;
 
     @Override
@@ -39,12 +40,14 @@ public class SetsActivity extends AppCompatActivity {
 
         gridViewSets = findViewById(R.id.setsActivity_gridViewSets);
 
+
         loadingDialog = new Dialog(SetsActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         loadingDialog.show();
+
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 
