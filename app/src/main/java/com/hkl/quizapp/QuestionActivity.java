@@ -1,6 +1,6 @@
 package com.hkl.quizapp;
 
-import static com.hkl.quizapp.SetsActivity.category_id;
+import static com.hkl.quizapp.SetsActivity.setIDs;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -22,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,6 +34,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class QuestionActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -70,6 +74,9 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         loadingDialog.show();
+
+        questionList = new ArrayList<>();
+
         setNo = getIntent().getIntExtra("SetNo", 1);
         System.out.println("Sets Number " + setNo);
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -78,39 +85,56 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void getQuestionList() {
+        questionList.clear();
 
-        firebaseFirestore.collection("Quiz").document("CAT" + String.valueOf(category_id)).
-                collection("SET" + String.valueOf(setNo)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        String currentCategoryId = SplashActivity.categoryList.get(SplashActivity.selected_category_index).getId();
+        firebaseFirestore.collection("Quiz").document(currentCategoryId)
+                .collection(setIDs.get(setNo))
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                if (task.isSuccessful()) {
-                    QuerySnapshot questions = task.getResult();
-
-                    for (QueryDocumentSnapshot doc : questions) {
-                        questionList.add(new Question(doc.getString("QUESTION"),
-                                doc.getString("A"),
-                                doc.getString("B"),
-                                doc.getString("C"),
-                                doc.getString("D"),
-                                Integer.valueOf(doc.getString("ANSWER"))));
-                    }
-                    if(questionList.size() ==0 || questionList == null){
-                        questionList.add(new Question("Question 1", "A", "B", "C", "D", 2));
-                        questionList.add(new Question("Question 2", "B", "B", "D", "A", 2));
-                        questionList.add(new Question("Question 3", "C", "B", "A", "D", 2));
-                        questionList.add(new Question("Question 4", "A", "D", "C", "B", 2));
-                        questionList.add(new Question("Question 5", "C", "D", "A", "D", 2));
-                    }
-                    setQuestion();
-
-
-                } else {
-                    Toast.makeText(QuestionActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Map<String, QueryDocumentSnapshot> docList = new ArrayMap<>();
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    docList.put(doc.getId(), doc);
                 }
-                loadingDialog.cancel();
+
+                QueryDocumentSnapshot questListDoc = docList.get("QUESTIONS_LIST");
+
+                String count = questListDoc.getString("COUNT");
+
+                for (int i = 0; i < Integer.valueOf(count); i++) {
+                    String quesID = questListDoc.getString("Q" + String.valueOf(i + 1) + "_ID");
+
+                    QueryDocumentSnapshot quesDoc = docList.get(quesID);
+                    questionList.add(new Question(
+                            quesDoc.getString("QUESTION"),
+                            quesDoc.getString("A"),
+                            quesDoc.getString("B"),
+                            quesDoc.getString("C"),
+                            quesDoc.getString("D"),
+                            Integer.valueOf(quesDoc.getString("ANSWER"))
+                    ));
+                }
+                if (questionList.size() == 0) {
+                    Toast.makeText(QuestionActivity.this,"NO Questions ",Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(QuestionActivity.this,SetsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    QuestionActivity.this.startActivity(intent);
+                    QuestionActivity.this.finish();
+                } else {
+                    setQuestion();
+                }
+                loadingDialog.dismiss();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(QuestionActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
             }
         });
+
+
     }
 
     private void setQuestion() {

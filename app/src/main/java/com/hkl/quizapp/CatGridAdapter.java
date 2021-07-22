@@ -12,14 +12,15 @@ import java.util.List;
 import java.util.Random;
 
 public class CatGridAdapter extends BaseAdapter {
-    public CatGridAdapter(List<String> categoryList) {
+    public List<CategoryModel> categoryList;
+
+    public CatGridAdapter(List<CategoryModel> categoryList) {
         this.categoryList = categoryList;
     }
 
     public CatGridAdapter() {
     }
 
-    public List<String> categoryList;
 
     @Override
     public int getCount() {
@@ -49,13 +50,12 @@ public class CatGridAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SplashActivity.selected_category_index=position;
                 Intent intent=new Intent(parent.getContext(),SetsActivity.class);
-                intent.putExtra("Category",categoryList.get(position));
-                intent.putExtra("Category_ID",position+1);
                 parent.getContext().startActivity(intent);
             }
         });
-        ((TextView) view.findViewById(R.id.categoryItemLayout_textViewCategoryName)).setText(categoryList.get(position));
+        ((TextView) view.findViewById(R.id.categoryItemLayout_textViewCategoryName)).setText(categoryList.get(position).getName());
 
         //random color
 

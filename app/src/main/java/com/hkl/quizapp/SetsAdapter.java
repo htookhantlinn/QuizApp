@@ -45,14 +45,15 @@ public class SetsAdapter extends BaseAdapter {
         } else {
             view = convertView;
         }
-        ((TextView) view.findViewById(R.id.setItemLayout_txtView)).setText(String.valueOf(position + 1));
+        ((TextView) view.findViewById(R.id.setItemLayout_txtView)).setText(SetsActivity.setIDs.get(position));
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(parent.getContext(),QuestionActivity.class);
-                intent.putExtra("SetNo",position+1);
-                parent.getContext().startActivity(intent);            }
+                Intent intent = new Intent(parent.getContext(), QuestionActivity.class);
+                intent.putExtra("SetNo", position);
+                parent.getContext().startActivity(intent);
+            }
         });
 
         return view;

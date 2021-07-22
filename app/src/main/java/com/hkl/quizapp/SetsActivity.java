@@ -1,5 +1,8 @@
 package com.hkl.quizapp;
 
+import static com.hkl.quizapp.SplashActivity.categoryList;
+import static com.hkl.quizapp.SplashActivity.selected_category_index;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,16 +18,22 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetsActivity extends AppCompatActivity {
 
     private GridView gridViewSets;
     private FirebaseFirestore firebaseFirestore;
-    public static int category_id;
+    // public static int category_id;
     private Dialog loadingDialog;
+    public static List<String> setIDs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +42,9 @@ public class SetsActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.setsActivity_toolbar);
         setSupportActionBar(toolbar);
-        String title = getIntent().getStringExtra("Category");
-        category_id = getIntent().getIntExtra("Category_ID", 1);
-        getSupportActionBar().setTitle(title);
+        /*String title = getIntent().getStringExtra("Category");
+        category_id = getIntent().getIntExtra("Category_ID", 1);*/
+        getSupportActionBar().setTitle(categoryList.get(selected_category_index).getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         gridViewSets = findViewById(R.id.setsActivity_gridViewSets);
@@ -64,32 +73,30 @@ public class SetsActivity extends AppCompatActivity {
     }
 
     private void loadSets() {
-        firebaseFirestore.collection("Quiz").document("CAT" + String.valueOf(category_id)).
-                get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        setIDs.clear();
+        firebaseFirestore.collection("Quiz").document(categoryList.get(selected_category_index).getId())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    System.out.println("Task successful");
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        long sets = (long) documentSnapshot.get("SETS");
-
-                        SetsAdapter setsAdapter = new SetsAdapter((int) sets);
-                        gridViewSets.setAdapter(setsAdapter);
-
-                        loadingDialog.cancel();
-
-                    } else {
-                        Toast.makeText(SetsActivity.this, "NO Category Document", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                } else {
-                    Toast.makeText(SetsActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                long noOfSets = (long) documentSnapshot.get("SETS");
+                for (int i = 1; i <= noOfSets; i++) {
+                    setIDs.add(documentSnapshot.getString("SET" + String.valueOf(i) + "_ID"));
                 }
-                loadingDialog.cancel();
+
+
+                SetsAdapter setsAdapter = new SetsAdapter(setIDs.size());
+                gridViewSets.setAdapter(setsAdapter);
+                loadingDialog.dismiss();
 
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(SetsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
+            }
         });
+
 
     }
 }

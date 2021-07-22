@@ -25,7 +25,8 @@ import java.util.List;
 public class SplashActivity extends AppCompatActivity {
 
     private TextView appName;
-    public static List<String> categoryList = new ArrayList<>();
+    public static List<CategoryModel> categoryList = new ArrayList<>();
+    public static int selected_category_index=0;
     public FirebaseFirestore firebaseFirestore;
 
     @Override
@@ -55,15 +56,16 @@ public class SplashActivity extends AppCompatActivity {
         firebaseFirestore.collection("Quiz").document("Categories").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) { 
+                if (task.isSuccessful()) {
                     System.out.println("Task successful");
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot.exists()) {
                         long count = (long) documentSnapshot.get("COUNT");
                         System.out.println("COUNT" + count);
                         for (int i = 0; i < count; i++) {
-                            String categoryName = documentSnapshot.getString("CAT" + String.valueOf(i + 1));
-                            categoryList.add(categoryName);
+                            String categoryName = documentSnapshot.getString("CAT" + String.valueOf(i + 1)+"_NAME");
+                            String categoryID = documentSnapshot.getString("CAT" + String.valueOf(i + 1)+"_ID");
+                                categoryList.add(new CategoryModel(categoryID,categoryName));
                             System.out.println("Category name" + categoryName);
                         }
                         System.out.println("CATEGORY List size" + categoryList.size());
